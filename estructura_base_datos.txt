@@ -1,0 +1,80 @@
+============================================================
+ESTRUCTURA DE BASE DE DATOS Y CONFIGURACIÓN (MYSQL)
+Proyecto: Cotizador PrintCraft
+============================================================
+
+Este archivo contiene el script SQL completo para crear las 5 tablas en Hostinger (phpMyAdmin) y la estructura de parámetros requerida.
+
+------------------------------------------------------------
+1. SCRIPT DE CREACIÓN DE TABLAS (SQL)
+------------------------------------------------------------
+
+-- Tabla de Usuarios (Accesos y Roles)
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `rol` ENUM('admin', 'vendedor') DEFAULT 'vendedor',
+  `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de Clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100),
+  `telefono` VARCHAR(50),
+  `empresa` VARCHAR(100),
+  `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de Parámetros Variables (Costos de Impresión)
+CREATE TABLE IF NOT EXISTS `parametros` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `clave` VARCHAR(50) NOT NULL UNIQUE,
+  `valor` DECIMAL(10, 2) NOT NULL,
+  `descripcion` VARCHAR(255),
+  `ultima_actualizacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de Productos (Catálogo)
+CREATE TABLE IF NOT EXISTS `productos` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nombre` VARCHAR(100) NOT NULL,
+  `descripcion` TEXT,
+  `peso_gramos` DECIMAL(10, 2) NOT NULL,
+  `tiempo_minutos` INT NOT NULL,
+  `ruta_imagen` VARCHAR(255),
+  `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla de Pedidos (Ventas Centralizadas)
+CREATE TABLE IF NOT EXISTS `pedidos` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `cliente_id` INT NOT NULL,
+  `usuario_id` INT NOT NULL,
+  `fecha_pedido` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `total` DECIMAL(10, 2) NOT NULL,
+  `estado` ENUM('pendiente', 'aprobado', 'rechazado', 'finalizado') DEFAULT 'pendiente',
+  FOREIGN KEY (`cliente_id`) REFERENCES `clientes`(`id`) ON DELETE RESTRICT,
+  FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+------------------------------------------------------------
+2. VALORES INICIALES PARA PARÁMETROS (EJEMPLO BASE)
+------------------------------------------------------------
+
+INSERT INTO `parametros` (`clave`, `valor`, `descripcion`) VALUES
+('precio_pla_kg', 2500.00, 'Precio base por kilogramo de filamento PLA'),
+('costo_luz_kwh', 45.00, 'Costo estimado de energía eléctrica por kWh'),
+('hora_maquina', 150.00, 'Costo de amortización y uso de impresora por hora'),
+('ganancia_porcentaje', 40.00, 'Margen de ganancia base aplicado al costo total');
+
+------------------------------------------------------------
+3. DATOS TÉCNICOS PARA TU ARCHIVO DE CONFIGURACIÓN (.env / config)
+------------------------------------------------------------
+DB_HOST = "localhost" (o la IP que te asigne Hostinger)
+DB_USER = "uXXXXXX_usuario"
+DB_PASS = "TuContraseñaSegura"
+DB_NAME = "uXXXXXX_cotizador"

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'PrintCraft Dashboard - Gestión de Impresión 3D y Resina',
+  title: 'Cotizador Dashboard',
   description: 'Dashboard para gestionar tu emprendimiento de impresión 3D y artesanías en resina. Controla costos, productos y pedidos.',
   generator: 'v0.app',
   icons: {
